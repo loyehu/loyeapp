@@ -8,13 +8,20 @@ var open = require('open');
 
 // 定义路径
 var app = {
-    devPath: './build/',
-    disPath: './dist/',     // 生产环境（上线）
+    devPath: './build/',    // 开发环境
+    disPath: './dist/',     // 生产环境
     srcPath: './src/'
 }
 
 // 打包依赖的插件和包
 gulp.task('bundle',function(){
+    gulp.src([
+        './bower_components/bootstrap/dist/css/bootstrap.min.css'
+    ])
+    .pipe($.plumber())
+    .pipe($.concat('bundle.css'))
+    .pipe(gulp.dest(app.devPath + '/static/style'))
+    .pipe(gulp.dest(app.disPath + '/static/style'))
     gulp.src([
         './bower_components/angular/angular.min.js',
         './bower_components/angular-route/angular-route.min.js',
@@ -33,6 +40,18 @@ gulp.task('script',function(){
     .pipe($.uglify())   // 压缩js文件
     .pipe(gulp.dest(app.disPath + 'static/js'))    // 生成到生产环境里面
 })
+gulp.task('template',function(){
+    gulp.src('./src/view/**/*.html')
+    .pipe($.plumber())
+    .pipe(gulp.dest(app.devPath + 'view'))
+    .pipe(gulp.dest(app.disPath + 'view'))
+})
+// 配置监听
+gulp.task('watch',function(){
+    gulp.watch('./src/script/**/*.js',['script']);
+    gulp.watch('./src/view/**/*.html',['template']);
+})
+
 
 // 启动一个serve
 gulp.task('serve',function(){
@@ -45,8 +64,10 @@ gulp.task('serve',function(){
 })
 gulp.task('dev',[
     'serve',
+    'watch',
     'script',
-    'bundle'
+    'bundle',
+    'template'
 ])
 
 

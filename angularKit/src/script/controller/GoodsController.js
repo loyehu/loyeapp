@@ -9,6 +9,9 @@ angular.module('controllers').controller('GoodsController',[
         $routeParams,
         GoodsService
     ){
-    $scope.goodList = GoodsService.fetchGoodsList();
+    GoodsService.fetchGoodsList().then(function(data){
+        console.log(data);
+        $scope.goodsList = data.data.data;
+    });
 
 }]);
